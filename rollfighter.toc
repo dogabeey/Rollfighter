@@ -4,6 +4,9 @@
 ## Notes: "Configurable DM Helper for Roll Fights in RP"
 ## Version: 0.01
 
-classClass.lua
+Classes\classClass.lua
+Classes\raceClass.lua
+Classes\zoneClass.lua
+Classes\advantageClass.lua
 classes.lua
 main.lua

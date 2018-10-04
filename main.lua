@@ -17,10 +17,10 @@ function SlashCmdList.ROLLFIGHT(msg,editbox)
 	local _, _, cmd, args = string.find(msg, "%s?(%w+)%s?(.*)")
 	if(cmd) then
 		if(cmd == "attack") then
-			if(args == "") then
-				AttackTarget()
+			if(UnitIsPlayer("target")) then
+				AttackPlayer()
 			else
-				AttackTo(args)
+				AttackNPC()
 			end
 		else
 			SendSystemMessage("There is no such sub-command.")
@@ -30,14 +30,14 @@ function SlashCmdList.ROLLFIGHT(msg,editbox)
 	end
 end
 
-function AttackTarget()
+function AttackPlayer()
 	local _, targetRealm = UnitFullName("target")
 	if(targetRealm == nil) then
 		C_ChatInfo.SendAddonMessageLogged(prefix, "Hey, I've just attacked you.", "WHISPER", GetUnitName("target"))
-	else SendSystemMessage("You must target a |cffaabb56player|r in your |cff1ce456realm.|r")
+	else SendSystemMessage("You must target a player in your |cff1ce456realm.|r")
 	end
 end
 
-function AttackTo(player)
+function AttackNPC()
 	C_ChatInfo.SendAddonMessageLogged(prefix, "Hey, I have just attacked you.", "WHISPER", GetUnitName(player))
 end
