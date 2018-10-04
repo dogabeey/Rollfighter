@@ -1,0 +1,9 @@
+## Interface: 80000
+## Title: Rollfighter
+## Author: dogabeey
+## Notes: "Configurable DM Helper for Roll Fights in RP"
+## Version: 0.01
+
+classClass.lua
+classes.lua
+main.lua
