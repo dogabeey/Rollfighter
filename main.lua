@@ -32,12 +32,17 @@ function SlashCmdList.ROLLFIGHT(msg,editbox)
 	end
 end
 
-local function CheckDistance(player1, player2)
+local function CheckDistance(player1, player2, dist)
 	
 	local p1x, p1y, p1z, p1map = UnitPosition(player1);
 	local p2x, p2y, p2z, p2map = UnitPosition(player2);
 	if(p1map == p2map) then
 		local delta = math.sqrt((p2x - p1x)*(p2x - p1x) + (p2y - p1y)*(p2y - p1y) + (p2z - p1z)*(p2z - p1z))
+		if(dist > delta) then
+			return true
+		else
+			return false
+		end
 	else
 		return false
 	end
