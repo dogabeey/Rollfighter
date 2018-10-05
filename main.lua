@@ -1,5 +1,6 @@
 local prefix = "rft__"
 local ok = C_ChatInfo.RegisterAddonMessagePrefix(prefix)
+-- local channelType = channelName = JoinChannelByName("xtensionxtooltip2")
 
 SLASH_ROLLFIGHT1 = "/rollfight"
 SLASH_ROLLFIGHT2 = "/rft"
@@ -32,9 +33,10 @@ end
 
 function AttackPlayer()
 	local _, targetRealm = UnitFullName("target")
-	if(targetRealm == nil) then
-		C_ChatInfo.SendAddonMessageLogged(prefix, "Hey, I've just attacked you.", "WHISPER", GetUnitName("target"))
-	else SendSystemMessage("You must target a player in your |cff1ce456realm.|r")
+	if(targetRealm == nil and (UnitInParty("target") or UnitName("player") == UnitName("target"))) then
+		local attacker_total_bonus_roll = DEF_ROLL + GetRPClass("Player").bonus_roll_att + GetRPRace("Player")
+	else 
+		SendSystemMessage("You must target a player in your |cff1ce456group.|r and |cff1ce456realm.|r")
 	end
 end
 

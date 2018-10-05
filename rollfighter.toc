@@ -8,5 +8,6 @@ Classes\classClass.lua
 Classes\raceClass.lua
 Classes\zoneClass.lua
 classes.lua
+races.lua
 advantages.lua
 main.lua

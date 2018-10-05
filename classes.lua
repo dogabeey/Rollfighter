@@ -1,3 +1,4 @@
+
 warrior = Class:Create("Warrior",0,0,1,1)
 paladin = Class:Create("Paladin",0,0,1,1)
 hunter = Class:Create("Hunter",0,0,1,1)
