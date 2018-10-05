@@ -1,7 +1,7 @@
 Class = {}
 Class.__index = Class
 
-function Class:Create(name, bonus_roll_att,bonus_roll_def,roll_multiplier_att,roll_multiplier_def)
+function Class:Create(name, bonus_roll_att,bonus_roll_def)
    local class = {}             -- our new object
    setmetatable(class,Class)  -- make Class handle lookup
    class.name = name

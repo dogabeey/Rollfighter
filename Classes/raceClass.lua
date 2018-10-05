@@ -1,7 +1,7 @@
 Race = {}
 Race.__index = Race
 
-function Race:Create(name, bonus_roll_att,bonus_roll_def,roll_multiplier_att,roll_multiplier_def)
+function Race:Create(name, bonus_roll_att,bonus_roll_def)
    local race = {}             -- our new object
    setmetatable(race,Race)  -- make Race handle lookup
    race.name = name
