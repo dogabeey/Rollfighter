@@ -39,5 +39,5 @@ function AttackPlayer()
 end
 
 function AttackNPC()
-	C_ChatInfo.SendAddonMessageLogged(prefix, "Hey, I have just attacked you.", "WHISPER", GetUnitName(player))
+
 end
