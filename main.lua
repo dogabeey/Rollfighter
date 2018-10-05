@@ -32,6 +32,17 @@ function SlashCmdList.ROLLFIGHT(msg,editbox)
 	end
 end
 
+local function CheckDistance(player1, player2)
+	
+	local p1x, p1y, p1z, p1map = UnitPosition(player1);
+	local p2x, p2y, p2z, p2map = UnitPosition(player2);
+	if(p1map == p2map) then
+		local delta = math.sqrt((p2x - p1x)*(p2x - p1x) + (p2y - p1y)*(p2y - p1y) + (p2z - p1z)*(p2z - p1z))
+	else
+		return false
+	end
+end
+
 function AttackPlayer()
 	local _, targetRealm = UnitFullName("target")
 	if(targetRealm == nil and (UnitInParty("target") or UnitName("player") == UnitName("target"))) then
@@ -41,6 +52,8 @@ function AttackPlayer()
 		local defender_total_bonus_roll = DEF_ROLL + GetRPClass("target").bonus_roll_att + GetRPRace("target").bonus_roll_att
 		local dice_result_attacker = math.random(attacker_total_bonus_roll)
 		local dice_result_defender = math.random(defender_total_bonus_roll)
+		-- IMPORTANT: In release; SendAddonMessageLogged(...) will be sent to a whole channel and only closest players will be visually notified.
+		-- "WHISPER" argument is debugging purposes only, since It seems I'm not able to send signal to myself via channels.
 		if(dice_result_attacker > dice_result_defender) then
 			C_ChatInfo.SendAddonMessageLogged(prefix, player .. " successfully hit their opponent " .. target 
 			.. ", by rolling " .. dice_result_attacker .. " over " .. attacker_total_bonus_roll .. " while opponent rolled " 
