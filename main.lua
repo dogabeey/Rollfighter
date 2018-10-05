@@ -1,6 +1,6 @@
 local prefix = "rft__"
 local ok = C_ChatInfo.RegisterAddonMessagePrefix(prefix)
-local channelType = channelName = JoinChannelByName("xtensionxtooltip2")
+local channelType , channelName = JoinChannelByName("xtensionxtooltip2")
 
 SLASH_ROLLFIGHT1 = "/rollfight"
 SLASH_ROLLFIGHT2 = "/rft"

@@ -103,7 +103,7 @@ BONUS_ROLL =
 		{
 			ATTACK = 0,
 			DEFEND = 0                            },
-		GOBLIN = 
+		PANDAREN = 
 		{
 			ATTACK = 0,
 			DEFEND = 0                            },
