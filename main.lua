@@ -12,6 +12,9 @@ frame:SetScript("OnEvent",
 function(self, event, pre, message, dist, sender)
 	if(event == "CHAT_MSG_ADDON_LOGGED") then
 		SendSystemMessage(message)
+		local senderraw = SeperateString(sender, "-")
+		print(sender .. " : " .. senderraw[1])
+		print(CheckDistance(senderraw[1],"player",40))
 	end
 end)
 
@@ -32,25 +35,39 @@ function SlashCmdList.ROLLFIGHT(msg,editbox)
 	end
 end
 
-local function CheckDistance(player1, player2, dist)
-	
-	local p1x, p1y, p1z, p1map = UnitPosition(player1);
-	local p2x, p2y, p2z, p2map = UnitPosition(player2);
+function SeperateString(inputstr, sep)
+        if sep == nil then
+                sep = "%s"
+        end
+        local t={} ; local i=1
+        for str in string.gmatch(inputstr, "([^"..sep.."]+)") do
+                t[i] = str
+                i = i + 1
+        end
+        return t
+end
+
+function CheckDistance(player1, player2, dist)
+	local p1x, p1y, p1z, p1map = UnitPosition(player1)
+	print(UnitName(player1) .. "'s position is " .. p1x .. " " .. p1y .. " " .. p1z .. ".") 
+	local p2x, p2y, p2z, p2map = UnitPosition(player2)
+	print(UnitName(player2) .. "'s position is " .. p2x .. " " .. p2y .. " " .. p2z .. ".") 
 	if(p1map == p2map) then
 		local delta = math.sqrt((p2x - p1x)*(p2x - p1x) + (p2y - p1y)*(p2y - p1y) + (p2z - p1z)*(p2z - p1z))
+		print("Distance between them is " .. delta .. ".")
 		if(dist > delta) then
-			return true
+			return 1
 		else
-			return false
+			return 0
 		end
 	else
-		return false
+		return -1
 	end
 end
 
 function AttackPlayer()
 	local _, targetRealm = UnitFullName("target")
-	if(targetRealm == nil and (UnitInParty("target") or UnitName("player") == UnitName("target"))) then
+	if(targetRealm == nil) then
 		local player = UnitName("player")
 		local target = UnitName("target")
 		local attacker_total_bonus_roll = DEF_ROLL + GetRPClass("player").bonus_roll_att + GetRPRace("player").bonus_roll_att
