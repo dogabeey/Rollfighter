@@ -80,18 +80,19 @@ function AttackPlayer()
 		local dice_result_defender = math.random(defender_total_bonus_roll)
 		-- IMPORTANT: In release; SendAddonMessageLogged(...) will be sent to a whole group once configs are added. Not the channel.
 		-- "WHISPER" argument is debugging purposes only, since It seems I'm not able to send signal to myself via channels.
+		local messageType = "PARTY"
 		if(dice_result_attacker - dice_result_defender > attacker_critical_strike_chance) then
-			C_ChatInfo.SendAddonMessageLogged(prefix, "A critical hit!! " .. player .. " critically hit their opponent and damaged " .. target 
+			C_ChatInfo.SendAddonMessageLogged(prefix, "A critical hit!! " .. player .. " critically hit their opponent " .. target 
 			.. " with " .. attacker_critical_strike_damage .. " damage, by rolling " .. dice_result_attacker .. " over " .. attacker_total_bonus_roll .. " while opponent rolled " 
-			.. dice_result_defender .. " over " .. defender_total_bonus_roll .. ".", "WHISPER",target)
+			.. dice_result_defender .. " over " .. defender_total_bonus_roll .. ".", messageType)
 		elseif(dice_result_attacker > dice_result_defender) then
-			C_ChatInfo.SendAddonMessageLogged(prefix, "Success! " .. player .. " was able to hit their opponent and damaged " .. target 
+			C_ChatInfo.SendAddonMessageLogged(prefix, "Success! " .. player .. " damaged their opponent " .. target 
 			.. " with " .. DEF_NORMAL_DAMAGE .. " damage, by rolling " .. dice_result_attacker .. " over " .. attacker_total_bonus_roll .. " while opponent rolled " 
-			.. dice_result_defender .. " over " .. defender_total_bonus_roll .. ".", "WHISPER",target)
+			.. dice_result_defender .. " over " .. defender_total_bonus_roll .. ".", messageType)
 		else
 			C_ChatInfo.SendAddonMessageLogged(prefix, player .. " missed an attack against " .. target 
 			.. ", by rolling " .. dice_result_attacker .. " over " .. attacker_total_bonus_roll .. " while opponent rolled " 
-			.. dice_result_defender .. " over " .. defender_total_bonus_roll .. ".", "WHISPER",target)
+			.. dice_result_defender .. " over " .. defender_total_bonus_roll .. ".", messageType)
 		end
 	else 
 		SendSystemMessage("You must target a player in your |cff1ce456realm.|r")
