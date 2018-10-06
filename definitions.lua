@@ -1,4 +1,5 @@
 DEF_ROLL = 100
+DEF_NOTIFY_RANGE = 40 -- in yards. default is 40.
 
 BONUS_ROLL = 
 {

@@ -10,11 +10,11 @@ frame:RegisterEvent("CHAT_MSG_ADDON_LOGGED")
 
 frame:SetScript("OnEvent", 
 function(self, event, pre, message, dist, sender)
-	if(event == "CHAT_MSG_ADDON_LOGGED") then
+	local senderraw = SeperateString(sender, "-")
+	--print(sender .. " : " .. senderraw[1])
+	--print(CheckDistance(senderraw[1],"player",40))
+	if(event == "CHAT_MSG_ADDON_LOGGED" and (CheckDistance(senderraw[1],"player",40)) == 1) then
 		SendSystemMessage(message)
-		local senderraw = SeperateString(sender, "-")
-		print(sender .. " : " .. senderraw[1])
-		print(CheckDistance(senderraw[1],"player",40))
 	end
 end)
 
@@ -49,12 +49,12 @@ end
 
 function CheckDistance(player1, player2, dist)
 	local p1x, p1y, p1z, p1map = UnitPosition(player1)
-	print(UnitName(player1) .. "'s position is " .. p1x .. " " .. p1y .. " " .. p1z .. ".") 
+	--print(UnitName(player1) .. "'s position is " .. p1x .. " " .. p1y .. " " .. p1z .. ".") 
 	local p2x, p2y, p2z, p2map = UnitPosition(player2)
-	print(UnitName(player2) .. "'s position is " .. p2x .. " " .. p2y .. " " .. p2z .. ".") 
+	--print(UnitName(player2) .. "'s position is " .. p2x .. " " .. p2y .. " " .. p2z .. ".") 
 	if(p1map == p2map) then
 		local delta = math.sqrt((p2x - p1x)*(p2x - p1x) + (p2y - p1y)*(p2y - p1y) + (p2z - p1z)*(p2z - p1z))
-		print("Distance between them is " .. delta .. ".")
+		--print("Distance between them is " .. delta .. ".")
 		if(dist > delta) then
 			return 1
 		else
@@ -74,19 +74,19 @@ function AttackPlayer()
 		local defender_total_bonus_roll = DEF_ROLL + GetRPClass("target").bonus_roll_att + GetRPRace("target").bonus_roll_att
 		local dice_result_attacker = math.random(attacker_total_bonus_roll)
 		local dice_result_defender = math.random(defender_total_bonus_roll)
-		-- IMPORTANT: In release; SendAddonMessageLogged(...) will be sent to a whole channel and only closest players will be visually notified.
+		-- IMPORTANT: In release; SendAddonMessageLogged(...) will be sent to a whole group once configs are added. Not the channel.
 		-- "WHISPER" argument is debugging purposes only, since It seems I'm not able to send signal to myself via channels.
 		if(dice_result_attacker > dice_result_defender) then
 			C_ChatInfo.SendAddonMessageLogged(prefix, player .. " successfully hit their opponent " .. target 
 			.. ", by rolling " .. dice_result_attacker .. " over " .. attacker_total_bonus_roll .. " while opponent rolled " 
-			.. dice_result_defender .. " over " .. defender_total_bonus_roll .. ".", "WHISPER", target)
+			.. dice_result_defender .. " over " .. defender_total_bonus_roll .. ".", "WHISPER",target)
 		else
 			C_ChatInfo.SendAddonMessageLogged(prefix, player .. " missed an attack against " .. target 
 			.. ", by rolling " .. dice_result_attacker .. " over " .. attacker_total_bonus_roll .. " while opponent rolled " 
-			.. dice_result_defender .. " over " .. defender_total_bonus_roll .. ".", "WHISPER", target)
+			.. dice_result_defender .. " over " .. defender_total_bonus_roll .. ".", "WHISPER",target)
 		end
 	else 
-		SendSystemMessage("You must target a player in your |cff1ce456group.|r and |cff1ce456realm.|r")
+		SendSystemMessage("You must target a player in your |cffff6e00group.|r and |cff1ce456realm.|r")
 	end
 end
 
