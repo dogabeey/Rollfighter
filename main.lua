@@ -13,7 +13,7 @@ function(self, event, pre, message, dist, sender)
 	local senderraw = SeperateString(sender, "-")
 	--print(sender .. " : " .. senderraw[1])
 	--print(CheckDistance(senderraw[1],"player",40))
-	if(event == "CHAT_MSG_ADDON_LOGGED" and (CheckDistance(senderraw[1],"player",40)) == 1) then
+	if(event == "CHAT_MSG_ADDON_LOGGED" and (CheckDistance(senderraw[1],"player",NOTIFY_RANGE)) == 1) then
 		SendSystemMessage(message)
 	end
 end)
@@ -86,7 +86,7 @@ function AttackPlayer()
 			.. dice_result_defender .. " over " .. defender_total_bonus_roll .. ".", "WHISPER",target)
 		end
 	else 
-		SendSystemMessage("You must target a player in your |cffff6e00group.|r and |cff1ce456realm.|r")
+		SendSystemMessage("You must target a player in your |cff1ce456realm.|r")
 	end
 end
 
