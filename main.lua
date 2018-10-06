@@ -70,15 +70,23 @@ function AttackPlayer()
 	if(targetRealm == nil) then
 		local player = UnitName("player")
 		local target = UnitName("target")
+		
 		local attacker_total_bonus_roll = DEF_ROLL + GetRPClass("player").bonus_roll_att + GetRPRace("player").bonus_roll_att
 		local defender_total_bonus_roll = DEF_ROLL + GetRPClass("target").bonus_roll_att + GetRPRace("target").bonus_roll_att
+		local attacker_critical_strike_damage = GetRPClass("player").crit_damage
+		local attacker_critical_strike_chance = GetRPClass("player").crit_chance
+		
 		local dice_result_attacker = math.random(attacker_total_bonus_roll)
 		local dice_result_defender = math.random(defender_total_bonus_roll)
 		-- IMPORTANT: In release; SendAddonMessageLogged(...) will be sent to a whole group once configs are added. Not the channel.
 		-- "WHISPER" argument is debugging purposes only, since It seems I'm not able to send signal to myself via channels.
-		if(dice_result_attacker > dice_result_defender) then
-			C_ChatInfo.SendAddonMessageLogged(prefix, player .. " successfully hit their opponent " .. target 
-			.. ", by rolling " .. dice_result_attacker .. " over " .. attacker_total_bonus_roll .. " while opponent rolled " 
+		if(dice_result_attacker - dice_result_defender > attacker_critical_strike_chance) then
+			C_ChatInfo.SendAddonMessageLogged(prefix, "A critical hit!! " .. player .. " critically hit their opponent and damaged " .. target 
+			.. " with " .. attacker_critical_strike_damage .. " damage, by rolling " .. dice_result_attacker .. " over " .. attacker_total_bonus_roll .. " while opponent rolled " 
+			.. dice_result_defender .. " over " .. defender_total_bonus_roll .. ".", "WHISPER",target)
+		elseif(dice_result_attacker > dice_result_defender) then
+			C_ChatInfo.SendAddonMessageLogged(prefix, "Success! " .. player .. " was able to hit their opponent and damaged " .. target 
+			.. " with " .. DEF_NORMAL_DAMAGE .. " damage, by rolling " .. dice_result_attacker .. " over " .. attacker_total_bonus_roll .. " while opponent rolled " 
 			.. dice_result_defender .. " over " .. defender_total_bonus_roll .. ".", "WHISPER",target)
 		else
 			C_ChatInfo.SendAddonMessageLogged(prefix, player .. " missed an attack against " .. target 
