@@ -28,7 +28,37 @@ function SlashCmdList.ROLLFIGHT(msg,editbox)
 				AttackNPC()
 			end
 		elseif(cmd == "config") then
-			AddonConfig:Show()
+			args = SeperateString(args," ")
+			if(args[1] == "def_roll") then
+				if(args[2]) then
+					if(tonumber(args[2]) ~= nil) then
+						DEF_ROLL = args[2]
+						SendSystemMessage("DEFAULT ROLL: " .. DEF_ROLL)
+					else 
+						SendSystemMessage("Enter a decimal, please!")
+					end
+				else
+					SendSystemMessage("Please specify a value for variable.")
+				end
+			else
+				SendSystemMessage("Please specify a config variable.")
+			end
+			-- TODO: More generic config code.
+			-- TODO: Find and easy way to automaticly add config command for each saved variables.
+			if(args[1] == "def_roll") then
+				if(args[2]) then
+					if(tonumber(args[2]) ~= nil) then
+						DEF_ROLL = args[2]
+						SendSystemMessage("DEFAULT ROLL: " .. DEF_ROLL)
+					else 
+						SendSystemMessage("Enter a decimal, please!")
+					end
+				else
+					SendSystemMessage("Please specify a value for variable.")
+				end
+			else
+				SendSystemMessage("Please specify a config variable.")
+			end
 		else
 			SendSystemMessage("There is no such sub-command.")
 		end
