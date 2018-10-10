@@ -27,6 +27,8 @@ function SlashCmdList.ROLLFIGHT(msg,editbox)
 			else
 				AttackNPC()
 			end
+		elseif(cmd == "config") then
+			AddonConfig:Show()
 		else
 			SendSystemMessage("There is no such sub-command.")
 		end
