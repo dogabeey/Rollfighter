@@ -13,7 +13,7 @@ function(self, event, pre, message, dist, sender)
 	local senderraw = SeperateString(sender, "-")
 	--print(sender .. " : " .. senderraw[1])
 	--print(CheckDistance(senderraw[1],"player",40))
-	if(event == "CHAT_MSG_ADDON_LOGGED" and (CheckDistance(senderraw[1],"player",NOTIFY_RANGE)) == 1) then
+	if(event == "CHAT_MSG_ADDON_LOGGED" and (CheckDistance(senderraw[1],"player",GLOBAL.NOTIFY_RANGE)) == 1) then
 		SendSystemMessage(message)
 	end
 end)
@@ -29,41 +29,32 @@ function SlashCmdList.ROLLFIGHT(msg,editbox)
 			end
 		elseif(cmd == "config") then
 			args = SeperateString(args," ")
-			if(args[1] == "def_roll") then
-				if(args[2]) then
-					if(tonumber(args[2]) ~= nil) then
-						DEF_ROLL = args[2]
-						SendSystemMessage("DEFAULT ROLL: " .. DEF_ROLL)
-					else 
-						SendSystemMessage("Enter a decimal, please!")
-					end
-				else
-					SendSystemMessage("Please specify a value for variable.")
-				end
-			else
-				SendSystemMessage("Please specify a config variable.")
-			end
-			-- TODO: More generic config code.
-			-- TODO: Find and easy way to automaticly add config command for each saved variables.
-			if(args[1] == "def_roll") then
-				if(args[2]) then
-					if(tonumber(args[2]) ~= nil) then
-						DEF_ROLL = args[2]
-						SendSystemMessage("DEFAULT ROLL: " .. DEF_ROLL)
-					else 
-						SendSystemMessage("Enter a decimal, please!")
-					end
-				else
-					SendSystemMessage("Please specify a value for variable.")
-				end
-			else
-				SendSystemMessage("Please specify a config variable.")
-			end
+			-- TODO: Find and easy way to automaticly add config command for each saved variables. UPDATE: Poor LUA can't get name of variables. Boo. Consider define name in each table.
+			DefineConfig(args,"def_crit_chance")
 		else
 			SendSystemMessage("There is no such sub-command.")
 		end
 	else
 		
+	end
+end
+
+-- global variable name defined in definitions.lua should be written as second parameter, case-insensitive.
+function DefineConfig(args, variable_text, error_text)
+	if(args[1] == variable_text) then
+		if(args[2]) then
+			if(tonumber(args[2]) ~= nil) then
+				GLOBAL[val] = args[2]
+				SendSystemMessage("New value of " .. variable_text .. " is " .. GLOBAL[val])
+			else 
+				SendSystemMessage("Enter a decimal, please!")
+			end
+		else
+			local val = string.upper(variable_text)
+			SendSystemMessage(variable_text .. ": " .. GLOBAL[val])
+		end
+	else
+		SendSystemMessage("Please specify a correct config variable.")
 	end
 end
 
@@ -103,8 +94,8 @@ function AttackPlayer()
 		local player = UnitName("player")
 		local target = UnitName("target")
 		
-		local attacker_total_bonus_roll = DEF_ROLL + GetRPClass("player").bonus_roll_att + GetRPRace("player").bonus_roll_att
-		local defender_total_bonus_roll = DEF_ROLL + GetRPClass("target").bonus_roll_att + GetRPRace("target").bonus_roll_att
+		local attacker_total_bonus_roll = GLOBAL.DEF_ROLL + GetRPClass("player").bonus_roll_att + GetRPRace("player").bonus_roll_att
+		local defender_total_bonus_roll = GLOBAL.DEF_ROLL + GetRPClass("target").bonus_roll_att + GetRPRace("target").bonus_roll_att
 		local attacker_critical_strike_damage = GetRPClass("player").crit_damage
 		local attacker_critical_strike_chance = GetRPClass("player").crit_chance
 		
@@ -119,7 +110,7 @@ function AttackPlayer()
 			.. dice_result_defender .. " over " .. defender_total_bonus_roll .. ".", messageType)
 		elseif(dice_result_attacker > dice_result_defender) then
 			C_ChatInfo.SendAddonMessageLogged(prefix, "Success! " .. player .. " damaged their opponent " .. target 
-			.. " with " .. DEF_NORMAL_DAMAGE .. " damage, by rolling " .. dice_result_attacker .. " over " .. attacker_total_bonus_roll .. " while opponent rolled " 
+			.. " with " .. GLOBAL.DEF_NORMAL_DAMAGE .. " damage, by rolling " .. dice_result_attacker .. " over " .. attacker_total_bonus_roll .. " while opponent rolled " 
 			.. dice_result_defender .. " over " .. defender_total_bonus_roll .. ".", messageType)
 		else
 			C_ChatInfo.SendAddonMessageLogged(prefix, player .. " missed an attack against " .. target 
