@@ -30,7 +30,7 @@ function SlashCmdList.ROLLFIGHT(msg,editbox)
 		elseif(cmd == "config") then
 			args = SeperateString(args," ")
 			-- TODO: Find and easy way to automaticly add config command for each saved variables. UPDATE: Poor LUA can't get name of variables. Boo. Consider define name in each table.
-			DefineConfig(args,"def_crit_chance")
+			DefineConfig(args,"def_roll")
 		else
 			SendSystemMessage("There is no such sub-command.")
 		end
@@ -90,38 +90,65 @@ end
 
 function AttackPlayer()
 	local _, targetRealm = UnitFullName("target")
-	if(targetRealm == nil) then
-		local player = UnitName("player")
-		local target = UnitName("target")
-		
-		local attacker_total_bonus_roll = GLOBAL.DEF_ROLL + GetRPClass("player").bonus_roll_att + GetRPRace("player").bonus_roll_att
-		local defender_total_bonus_roll = GLOBAL.DEF_ROLL + GetRPClass("target").bonus_roll_att + GetRPRace("target").bonus_roll_att
-		local attacker_critical_strike_damage = GetRPClass("player").crit_damage
-		local attacker_critical_strike_chance = GetRPClass("player").crit_chance
-		
-		local dice_result_attacker = math.random(attacker_total_bonus_roll)
-		local dice_result_defender = math.random(defender_total_bonus_roll)
-		-- IMPORTANT: In release; SendAddonMessageLogged(...) will be sent to a whole group once configs are added. Not the channel.
-		-- "WHISPER" argument is debugging purposes only, since It seems I'm not able to send signal to myself via channels.
-		local messageType = "PARTY"
-		if(dice_result_attacker - dice_result_defender > attacker_critical_strike_chance) then
-			C_ChatInfo.SendAddonMessageLogged(prefix, "A critical hit!! " .. player .. " critically hit their opponent " .. target 
-			.. " with " .. attacker_critical_strike_damage .. " damage, by rolling " .. dice_result_attacker .. " over " .. attacker_total_bonus_roll .. " while opponent rolled " 
-			.. dice_result_defender .. " over " .. defender_total_bonus_roll .. ".", messageType)
-		elseif(dice_result_attacker > dice_result_defender) then
-			C_ChatInfo.SendAddonMessageLogged(prefix, "Success! " .. player .. " damaged their opponent " .. target 
-			.. " with " .. GLOBAL.DEF_NORMAL_DAMAGE .. " damage, by rolling " .. dice_result_attacker .. " over " .. attacker_total_bonus_roll .. " while opponent rolled " 
-			.. dice_result_defender .. " over " .. defender_total_bonus_roll .. ".", messageType)
-		else
-			C_ChatInfo.SendAddonMessageLogged(prefix, player .. " missed an attack against " .. target 
-			.. ", by rolling " .. dice_result_attacker .. " over " .. attacker_total_bonus_roll .. " while opponent rolled " 
-			.. dice_result_defender .. " over " .. defender_total_bonus_roll .. ".", messageType)
+	if(UnitIsGroupLeader("player")
+		if(targetRealm == nil) then
+			local player = UnitName("player")
+			local target = UnitName("target")
+			
+			local attacker_total_bonus_roll = GLOBAL.DEF_ROLL + GetRPClass("player").bonus_roll_att + GetRPRace("player").bonus_roll_att
+			local defender_total_bonus_roll = GLOBAL.DEF_ROLL + GetRPClass("target").bonus_roll_att + GetRPRace("target").bonus_roll_att
+			local attacker_critical_strike_damage = GetRPClass("player").crit_damage
+			local attacker_critical_strike_chance = GetRPClass("player").crit_chance
+			
+			local dice_result_attacker = math.random(attacker_total_bonus_roll)
+			local dice_result_defender = math.random(defender_total_bonus_roll)
+			-- IMPORTANT: In release; SendAddonMessageLogged(...) will be sent to a whole group once configs are added. Not the channel.
+			-- "WHISPER" argument is debugging purposes only, since It seems I'm not able to send signal to myself via channels.
+			local messageType = "PARTY"
+			if(dice_result_attacker - dice_result_defender > attacker_critical_strike_chance) then
+				C_ChatInfo.SendAddonMessageLogged(prefix, "A critical hit!! " .. player .. " critically hit their opponent " .. target 
+				.. " with " .. attacker_critical_strike_damage .. " damage, by rolling " .. dice_result_attacker .. " over " .. attacker_total_bonus_roll .. " while opponent rolled " 
+				.. dice_result_defender .. " over " .. defender_total_bonus_roll .. ".", messageType)
+			elseif(dice_result_attacker > dice_result_defender) then
+				C_ChatInfo.SendAddonMessageLogged(prefix, "Success! " .. player .. " damaged their opponent " .. target 
+				.. " with " .. GLOBAL.DEF_NORMAL_DAMAGE .. " damage, by rolling " .. dice_result_attacker .. " over " .. attacker_total_bonus_roll .. " while opponent rolled " 
+				.. dice_result_defender .. " over " .. defender_total_bonus_roll .. ".", messageType)
+			else
+				C_ChatInfo.SendAddonMessageLogged(prefix, player .. " missed an attack against " .. target 
+				.. ", by rolling " .. dice_result_attacker .. " over " .. attacker_total_bonus_roll .. " while opponent rolled " 
+				.. dice_result_defender .. " over " .. defender_total_bonus_roll .. ".", messageType)
+			end
+		else 
+			SendSystemMessage("You must target a player in your |cff1ce456realm.|r")
 		end
-	else 
-		SendSystemMessage("You must target a player in your |cff1ce456realm.|r")
 	end
 end
 
 function AttackNPC()
-
+	local player = UnitName("player")
+	local target = UnitName("target")
+	
+	local attacker_total_bonus_roll = GLOBAL.DEF_ROLL + GetRPClass("player").bonus_roll_att + GetRPRace("player").bonus_roll_att
+	local defender_total_bonus_roll = GLOBAL.DEF_ROLL
+	local attacker_critical_strike_damage = GetRPClass("player").crit_damage
+	local attacker_critical_strike_chance = GetRPClass("player").crit_chance
+	
+	local dice_result_attacker = math.random(attacker_total_bonus_roll)
+	local dice_result_defender = math.random(defender_total_bonus_roll)
+	-- IMPORTANT: In release; SendAddonMessageLogged(...) will be sent to a whole group once configs are added. Not the channel.
+	-- "WHISPER" argument is debugging purposes only, since It seems I'm not able to send signal to myself via channels.
+	local messageType = "PARTY"
+	if(dice_result_attacker - dice_result_defender > attacker_critical_strike_chance) then
+		C_ChatInfo.SendAddonMessageLogged(prefix, "A critical hit!! " .. player .. " critically hit their opponent " .. target 
+		.. " with " .. attacker_critical_strike_damage .. " damage, by rolling " .. dice_result_attacker .. " over " .. attacker_total_bonus_roll .. " while opponent rolled " 
+		.. dice_result_defender .. " over " .. defender_total_bonus_roll .. ".", messageType)
+	elseif(dice_result_attacker > dice_result_defender) then
+		C_ChatInfo.SendAddonMessageLogged(prefix, "Success! " .. player .. " damaged their opponent " .. target 
+		.. " with " .. GLOBAL.DEF_NORMAL_DAMAGE .. " damage, by rolling " .. dice_result_attacker .. " over " .. attacker_total_bonus_roll .. " while opponent rolled " 
+		.. dice_result_defender .. " over " .. defender_total_bonus_roll .. ".", messageType)
+	else
+		C_ChatInfo.SendAddonMessageLogged(prefix, player .. " missed an attack against " .. target 
+		.. ", by rolling " .. dice_result_attacker .. " over " .. attacker_total_bonus_roll .. " while opponent rolled " 
+		.. dice_result_defender .. " over " .. defender_total_bonus_roll .. ".", messageType)
+	end
 end
