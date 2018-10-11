@@ -14,8 +14,16 @@ function(self, event, pre, message, dist, sender)
 	--print(sender .. " : " .. senderraw[1])
 	--print(CheckDistance(senderraw[1],"player",40))
 	if(event == "CHAT_MSG_ADDON_LOGGED" and (CheckDistance(senderraw[1],"player",GLOBAL.NOTIFY_RANGE)) == 1) then
-		SendSystemMessage(message)
+		if(dist == "PARTY" or dist == "RAID")
+			SendSystemMessage(message)
+		end
+		if(dist == "WHISPER" and senderraw[1] == UnitName("party1"))
+			local globa_string, globa_data = SeperateString(string.upper(message),"|")
+			GLOBAL[globa_string] = globa_data
+		end
 	end
+	-- TODO: Handle "PARTY_LEADER_CHANGED" event here and do SendGlobal every time leader changes. 
+	-- TODO: A RequestGlobal function maybe, which triggers SendGlobal to give it requested info.
 end)
 
 function SlashCmdList.ROLLFIGHT(msg,editbox)
@@ -39,6 +47,14 @@ function SlashCmdList.ROLLFIGHT(msg,editbox)
 	end
 end
 
+function SendGlobal(global_data_string, reciever)
+	local data = GLOBAL[global_data_string]
+	C_ChatInfo.SendAddonMessageLogged(prefix,global_data_string .. "|" .. data,"WHISPER",reciever)
+end
+
+function RecieveGlobal(global_data_string)
+end
+
 -- global variable name defined in definitions.lua should be written as second parameter, case-insensitive.
 function DefineConfig(args, variable_text, error_text)
 	if(args[1] == variable_text) then
@@ -59,15 +75,15 @@ function DefineConfig(args, variable_text, error_text)
 end
 
 function SeperateString(inputstr, sep)
-        if sep == nil then
-                sep = "%s"
-        end
-        local t={} ; local i=1
-        for str in string.gmatch(inputstr, "([^"..sep.."]+)") do
-                t[i] = str
-                i = i + 1
-        end
-        return t
+	if sep == nil then
+			sep = "%s"
+	end
+	local t={} ; local i=1
+	for str in string.gmatch(inputstr, "([^"..sep.."]+)") do
+			t[i] = str
+			i = i + 1
+	end
+	return t
 end
 
 function CheckDistance(player1, player2, dist)
@@ -121,6 +137,8 @@ function AttackPlayer()
 		else 
 			SendSystemMessage("You must target a player in your |cff1ce456realm.|r")
 		end
+	else
+		
 	end
 end
 
