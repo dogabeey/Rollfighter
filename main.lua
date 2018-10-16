@@ -1,11 +1,12 @@
 local prefix = "rft__"
 local prefix_req = "rft__req"
 local prefix_send = "rft__send"
+local prefix_val = "rft__val"
 
 local ok = C_ChatInfo.RegisterAddonMessagePrefix(prefix)
 ok = C_ChatInfo.RegisterAddonMessagePrefix(prefix_req)
 ok = C_ChatInfo.RegisterAddonMessagePrefix(prefix_send)
-
+ok = C_ChatInfo.RegisterAddonMessagePrefix(prefix_val)
 local channelType , channelName = JoinChannelByName("xtensionxtooltip2")
 
 SLASH_ROLLFIGHT1 = "/rollfight"
@@ -13,27 +14,39 @@ SLASH_ROLLFIGHT2 = "/rft"
 
 local frame = CreateFrame("Frame")
 frame:RegisterEvent("CHAT_MSG_ADDON_LOGGED")
+frame:RegisterEvent("PARTY_LEADER_CHANGED")
+
+local syncedPerson = nil
 
 frame:SetScript("OnEvent", 
 function(self, event, pre, message, dist, sender)
-	local senderraw = SeperateString(sender, "-")
-	--print(sender .. " : " .. senderraw[1])
-	--print(CheckDistance(senderraw[1],"player",40))
-	if(event == "CHAT_MSG_ADDON_LOGGED" and (CheckDistance(senderraw[1],"player",GLOBAL.NOTIFY_RANGE)) == 1) then
-		if(pre == prefix_send) then
-			print("message: " .. message)
-			local glob = SeperateString(string.upper(message),"-")
-			print(glob[1] .. ": " .. glob[2])
-			print(sender .. " sent you " .. glob[1] .. " data as " .. glob[2])
-			GLOBAL[global_string] = global_data
-		end
-		if(pre == prefix_req) then
-			print(sender .. " requested " .. message .. " data from you.")
-			SendGlobal(message,sender) -- "Return to sender"
-		end
-		if(dist == "PARTY" or dist == "RAID") then
-			SendSystemMessage(message)
-		end
+	if(event == "CHAT_MSG_ADDON_LOGGED") then
+		local senderraw = SeperateString(sender, "-")
+		--print(sender .. " : " .. senderraw[1])
+		--print(CheckDistance(senderraw[1],"player",40))
+		if((CheckDistance(senderraw[1],"player",GLOBAL.NOTIFY_RANGE)) == 1) then
+			if(pre == prefix_send) then
+				print("message: " .. message)
+				local glob = SeperateString(string.upper(message),"-")
+				print(glob[1] .. ": " .. glob[2])
+				print(sender .. " sent you " .. glob[1] .. " data as " .. glob[2])
+				GLOBAL[glob[1]] = glob[2]
+				syncedPerson = senderraw[1]
+			end
+			if(pre == prefix_req) then
+				print(sender .. " requested " .. message .. " data from you.")
+				SendGlobal(message,sender) -- "Return to sender"
+			end
+			if(pre == prefix_val) then
+				--
+			end
+			if(dist == "PARTY" or dist == "RAID") then
+				SendSystemMessage(message)
+			end
+	    end
+	end
+	if(event == "PARTY_LEADER_CHANGED" and not UnitIsGroupLeader("player"))then
+		RequestGlobal("DEF_ROLL")
 	end
 end)
 
@@ -60,14 +73,21 @@ end
 
 function SendGlobal(global_data_string, reciever)
 	local data = GLOBAL[global_data_string]
-	local recieverraw = SeperateString(reciever, "-")
-	print("Sending " .. global_data_string .. " with value of " .. data .. " to " .. recieverraw[1])
-	C_ChatInfo.SendAddonMessageLogged(prefix_send, global_data_string .. "-" .. data, "WHISPER", recieverraw[1])
+	if(reciever) then
+		local recieverraw = SeperateString(reciever, "-")
+		print("Sending " .. global_data_string .. " with value of " .. data .. " to " .. recieverraw[1])
+		 C_ChatInfo.SendAddonMessageLogged(prefix_send, global_data_string .. "-" .. data, "WHISPER", recieverraw[1])
+	else 
+		C_ChatInfo.SendAddonMessageLogged(prefix_send, global_data_string .. "-" .. data, "PARTY") end
 end
 
 function RequestGlobal(global_data_string)
 	print("Requesting " .. global_data_string .. " from " .. UnitName("party1"))
 	C_ChatInfo.SendAddonMessageLogged(prefix_req,global_data_string,"WHISPER",UnitName("party1"))
+end
+
+function DeSync()
+	C_ChatInfo.SendAddonMessageLogged(prefix_val," ","PARTY")
 end
 
 -- global variable name defined in definitions.lua should be written as second parameter, case-insensitive.
@@ -119,13 +139,24 @@ function CheckDistance(player1, player2, dist)
 	end
 end
 
+buffer = ""
+function StringifyTable(e)
+	if type(e) == "table" then
+        for k,v in pairs(e) do
+			print(v)
+            StringifyTable(v)
+        end
+    else 
+		print(e)
+    end
+end
+
 function AttackPlayer()
 	local _, targetRealm = UnitFullName("target")
 	if(UnitIsGroupLeader("player")) then
 		if(targetRealm == nil) then
 			local player = UnitName("player")
 			local target = UnitName("target")
-			
 			local attacker_total_bonus_roll = GLOBAL.DEF_ROLL + GetRPClass("player").bonus_roll_att + GetRPRace("player").bonus_roll_att
 			local defender_total_bonus_roll = GLOBAL.DEF_ROLL + GetRPClass("target").bonus_roll_att + GetRPRace("target").bonus_roll_att
 			local attacker_critical_strike_damage = GetRPClass("player").crit_damage
@@ -154,33 +185,36 @@ function AttackPlayer()
 		end
 	else
 		if(targetRealm == nil) then
-			local player = UnitName("player")
-			local target = UnitName("target")
-			
 			RequestGlobal("DEF_ROLL")
 			
-			local attacker_total_bonus_roll = GLOBAL.DEF_ROLL + GetRPClass("player").bonus_roll_att + GetRPRace("player").bonus_roll_att
-			local defender_total_bonus_roll = GLOBAL.DEF_ROLL + GetRPClass("target").bonus_roll_att + GetRPRace("target").bonus_roll_att
-			local attacker_critical_strike_damage = GetRPClass("player").crit_damage
-			local attacker_critical_strike_chance = GetRPClass("player").crit_chance
-			
-			local dice_result_attacker = math.random(attacker_total_bonus_roll)
-			local dice_result_defender = math.random(defender_total_bonus_roll)
-			-- IMPORTANT: In release; SendAddonMessageLogged(...) will be sent to a whole group once configs are added. Not the channel.
-			-- "WHISPER" argument is debugging purposes only, since It seems I'm not able to send signal to myself via channels.
-			local messageType = "PARTY"
-			if(dice_result_attacker - dice_result_defender > attacker_critical_strike_chance) then
-				C_ChatInfo.SendAddonMessageLogged(prefix, "A critical hit!! " .. player .. " critically hit their opponent " .. target 
-				.. " with " .. attacker_critical_strike_damage .. " damage, by rolling " .. dice_result_attacker .. " over " .. attacker_total_bonus_roll .. " while opponent rolled " 
-				.. dice_result_defender .. " over " .. defender_total_bonus_roll .. ".", messageType)
-			elseif(dice_result_attacker > dice_result_defender) then
-				C_ChatInfo.SendAddonMessageLogged(prefix, "Success! " .. player .. " damaged their opponent " .. target 
-				.. " with " .. GLOBAL.DEF_NORMAL_DAMAGE .. " damage, by rolling " .. dice_result_attacker .. " over " .. attacker_total_bonus_roll .. " while opponent rolled " 
-				.. dice_result_defender .. " over " .. defender_total_bonus_roll .. ".", messageType)
+			if(syncedPerson == UnitName("party1")) then
+				local player = UnitName("player")
+				local target = UnitName("target")
+				local attacker_total_bonus_roll = GLOBAL.DEF_ROLL + GetRPClass("player").bonus_roll_att + GetRPRace("player").bonus_roll_att
+				local defender_total_bonus_roll = GLOBAL.DEF_ROLL + GetRPClass("target").bonus_roll_att + GetRPRace("target").bonus_roll_att
+				local attacker_critical_strike_damage = GetRPClass("player").crit_damage
+				local attacker_critical_strike_chance = GetRPClass("player").crit_chance
+				
+				local dice_result_attacker = math.random(attacker_total_bonus_roll)
+				local dice_result_defender = math.random(defender_total_bonus_roll)
+				-- IMPORTANT: In release; SendAddonMessageLogged(...) will be sent to a whole group once configs are added. Not the channel.
+				-- "WHISPER" argument is debugging purposes only, since It seems I'm not able to send signal to myself via channels.
+				local messageType = "PARTY"
+				if(dice_result_attacker - dice_result_defender > attacker_critical_strike_chance) then
+					C_ChatInfo.SendAddonMessageLogged(prefix, "A critical hit!! " .. player .. " critically hit their opponent " .. target 
+					.. " with " .. attacker_critical_strike_damage .. " damage, by rolling " .. dice_result_attacker .. " over " .. attacker_total_bonus_roll .. " while opponent rolled " 
+					.. dice_result_defender .. " over " .. defender_total_bonus_roll .. ".", messageType)
+				elseif(dice_result_attacker > dice_result_defender) then
+					C_ChatInfo.SendAddonMessageLogged(prefix, "Success! " .. player .. " damaged their opponent " .. target 
+					.. " with " .. GLOBAL.DEF_NORMAL_DAMAGE .. " damage, by rolling " .. dice_result_attacker .. " over " .. attacker_total_bonus_roll .. " while opponent rolled " 
+					.. dice_result_defender .. " over " .. defender_total_bonus_roll .. ".", messageType)
+				else
+					C_ChatInfo.SendAddonMessageLogged(prefix, player .. " missed an attack against " .. target 
+					.. ", by rolling " .. dice_result_attacker .. " over " .. attacker_total_bonus_roll .. " while opponent rolled " 
+					.. dice_result_defender .. " over " .. defender_total_bonus_roll .. ".", messageType)
+				end
 			else
-				C_ChatInfo.SendAddonMessageLogged(prefix, player .. " missed an attack against " .. target 
-				.. ", by rolling " .. dice_result_attacker .. " over " .. attacker_total_bonus_roll .. " while opponent rolled " 
-				.. dice_result_defender .. " over " .. defender_total_bonus_roll .. ".", messageType)
+				SendSystemMessage("Your config is being synced with party leader. Please try again in a second.")
 			end
 		else 
 			SendSystemMessage("You must target a player in your |cff1ce456realm.|r")
