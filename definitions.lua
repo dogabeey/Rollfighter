@@ -6,7 +6,7 @@ GLOBAL.DEF_NORMAL_DAMAGE = 1
 GLOBAL.DEF_CRIT_DAMAGE = 2 -- Default total damage when player critically hits.
 GLOBAL.DEF_CRIT_CHANCE = 50 -- Default (attack - defend) roll difference to make an attack critical. SO ACTUALLY CHANCES -DROP- WHEN WE -INCREASE- THE NUMBER.
 
-GLOBAL.MAX_HEALTH = 10
+GLOBAL.MAX_HEALTH = 10 -- to be implemented
 GLOBAL.NOTIFY_RANGE = 40 -- in yards. default is 40.
 
 GLOBAL.ADVANTAGES = 

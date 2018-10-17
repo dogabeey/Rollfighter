@@ -15,6 +15,7 @@ SLASH_ROLLFIGHT2 = "/rft"
 local frame = CreateFrame("Frame")
 frame:RegisterEvent("CHAT_MSG_ADDON_LOGGED")
 frame:RegisterEvent("PARTY_LEADER_CHANGED")
+frame:RegisterEvent("ADDON_LOADED")
 
 local syncedPerson = nil
 
@@ -45,8 +46,8 @@ function(self, event, pre, message, dist, sender)
 			end
 	    end
 	end
-	if(event == "PARTY_LEADER_CHANGED" and not UnitIsGroupLeader("player"))then
-		RequestGlobal("DEF_ROLL")
+	if((event == "PARTY_LEADER_CHANGED" or event == "ADDON_LOADED") and not UnitIsGroupLeader("player"))then
+		RequestGlobal()
 	end
 end)
 
@@ -72,18 +73,72 @@ function SlashCmdList.ROLLFIGHT(msg,editbox)
 end
 
 function SendGlobal(global_data_string, reciever)
-	local data = GLOBAL[global_data_string]
-	if(reciever) then
-		local recieverraw = SeperateString(reciever, "-")
-		print("Sending " .. global_data_string .. " with value of " .. data .. " to " .. recieverraw[1])
-		 C_ChatInfo.SendAddonMessageLogged(prefix_send, global_data_string .. "-" .. data, "WHISPER", recieverraw[1])
-	else 
-		C_ChatInfo.SendAddonMessageLogged(prefix_send, global_data_string .. "-" .. data, "PARTY") end
+	local data = SeperateString(global_data_string,".")
+	if(data[4]) then
+		local real_data = GLOBAL[data[1]][data[2]][data[3]][data[4]]
+		if(reciever) then
+			local recieverraw = SeperateString(reciever, "-")
+			print("Sending " .. global_data_string .. " with value of " .. real_data .. " to " .. recieverraw[1])
+			 C_ChatInfo.SendAddonMessageLogged(prefix_send, global_data_string .. "-" .. real_data, "WHISPER", recieverraw[1])
+		else 
+			C_ChatInfo.SendAddonMessageLogged(prefix_send, global_data_string .. "-" .. real_data, "PARTY") 
+		end
+	elseif(data[3]) then
+		local real_data = GLOBAL[data[1]][data[2]][data[3]]
+		if(reciever) then
+			local recieverraw = SeperateString(reciever, "-")
+			print("Sending " .. global_data_string .. " with value of " .. real_data .. " to " .. recieverraw[1])
+			 C_ChatInfo.SendAddonMessageLogged(prefix_send, global_data_string .. "-" .. real_data, "WHISPER", recieverraw[1])
+		else 
+			C_ChatInfo.SendAddonMessageLogged(prefix_send, global_data_string .. "-" .. real_data, "PARTY") 
+		end
+	elseif(data[2]) then
+		local real_data = GLOBAL[data[1]][data[2]]
+		if(reciever) then
+			local recieverraw = SeperateString(reciever, "-")
+			print("Sending " .. global_data_string .. " with value of " .. real_data .. " to " .. recieverraw[1])
+			 C_ChatInfo.SendAddonMessageLogged(prefix_send, global_data_string .. "-" .. real_data, "WHISPER", recieverraw[1])
+		else 
+			C_ChatInfo.SendAddonMessageLogged(prefix_send, global_data_string .. "-" .. real_data, "PARTY") 
+		end
+	else
+		local real_data = GLOBAL[data[1]]
+		if(reciever) then
+			local recieverraw = SeperateString(reciever, "-")
+			print("Sending " .. global_data_string .. " with value of " .. real_data .. " to " .. recieverraw[1])
+			 C_ChatInfo.SendAddonMessageLogged(prefix_send, global_data_string .. "-" .. real_data, "WHISPER", recieverraw[1])
+		else 
+			C_ChatInfo.SendAddonMessageLogged(prefix_send, global_data_string .. "-" .. real_data, "PARTY") 
+		end
+	end
 end
 
 function RequestGlobal(global_data_string)
-	print("Requesting " .. global_data_string .. " from " .. UnitName("party1"))
-	C_ChatInfo.SendAddonMessageLogged(prefix_req,global_data_string,"WHISPER",UnitName("party1"))
+	if(global_data_string) then
+		print("Requesting " .. global_data_string .. " from " .. UnitName("party1"))
+		C_ChatInfo.SendAddonMessageLogged(prefix_req,global_data_string,"WHISPER",UnitName("party1"))
+	else
+		local rp_class = string.upper(GetRPClass("player").name)
+		local rp_race = string.upper(GetRPRace("player").name)
+	
+		C_ChatInfo.SendAddonMessageLogged(prefix_req,"DEF_ROLL","WHISPER",UnitName("party1"))
+		C_ChatInfo.SendAddonMessageLogged(prefix_req,"DEF_NORMAL_DAMAGE","WHISPER",UnitName("party1"))
+		C_ChatInfo.SendAddonMessageLogged(prefix_req,"DEF_CRIT_DAMAGE","WHISPER",UnitName("party1"))
+		C_ChatInfo.SendAddonMessageLogged(prefix_req,"DEF_CRIT_CHANCE","WHISPER",UnitName("party1"))
+		C_ChatInfo.SendAddonMessageLogged(prefix_req,"MAX_HEALTH","WHISPER",UnitName("party1"))
+		
+		C_ChatInfo.SendAddonMessageLogged(prefix_req,"ADVANTAGES.CLASS." .. rp_class .. ".ATTACK" ,"WHISPER",UnitName("party1"))
+		C_ChatInfo.SendAddonMessageLogged(prefix_req,"ADVANTAGES.CLASS." .. rp_class .. ".DEFEND" ,"WHISPER",UnitName("party1"))
+		C_ChatInfo.SendAddonMessageLogged(prefix_req,"ADVANTAGES.CLASS." .. rp_class .. ".CRIT_CHANCE" ,"WHISPER",UnitName("party1"))
+		C_ChatInfo.SendAddonMessageLogged(prefix_req,"ADVANTAGES.CLASS." .. rp_class .. ".CRIT_DAMAGE" ,"WHISPER",UnitName("party1"))
+		
+		C_ChatInfo.SendAddonMessageLogged(prefix_req,"ADVANTAGES.RACE." .. rp_race .. ".ATTACK" ,"WHISPER",UnitName("party1"))
+		C_ChatInfo.SendAddonMessageLogged(prefix_req,"ADVANTAGES.RACE." .. rp_race .. ".DEFEND" ,"WHISPER",UnitName("party1"))
+		C_ChatInfo.SendAddonMessageLogged(prefix_req,"ADVANTAGES.RACE." .. rp_race .. ".CRIT_CHANCE" ,"WHISPER",UnitName("party1"))
+		C_ChatInfo.SendAddonMessageLogged(prefix_req,"ADVANTAGES.RACE." .. rp_race .. ".CRIT_DAMAGE" ,"WHISPER",UnitName("party1"))
+		
+		-- TODO: BÜTÜN CLASSLARIN BİLGİSİ GEREKİYOR.
+	end
 end
 
 function DeSync()
@@ -185,7 +240,7 @@ function AttackPlayer()
 		end
 	else
 		if(targetRealm == nil) then
-			RequestGlobal("DEF_ROLL")
+			RequestGlobal()
 			
 			if(syncedPerson == UnitName("party1")) then
 				local player = UnitName("player")
