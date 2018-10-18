@@ -1,6 +1,7 @@
 do return end
 
 -- Numbers in those tables are bonus roll advantage of the class in index has against corresponding defending class.
+-- NOT IMPLEMENTED YET
 
 -- class advantages
 Adv_Class = {}

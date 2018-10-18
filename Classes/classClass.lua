@@ -1,5 +1,6 @@
 Class = {}
 Class.__index = Class
+class_list = {}
 
 function Class:Create(name, bonus_roll_att, bonus_roll_def,crit_damage,crit_chance)
    local class = {}             -- our new object
@@ -11,6 +12,7 @@ function Class:Create(name, bonus_roll_att, bonus_roll_def,crit_damage,crit_chan
    class.roll_multiplier_def = roll_multiplier_def
    class.crit_damage = crit_damage or GLOBAL.DEF_CRIT_DAMAGE
    class.crit_chance = crit_chance or GLOBAL.DEF_CRIT_CHANCE
+   class_list[class.name] = class
    --print("Created a class named " .. name .. " which has +" .. bonus_roll_att .. " bonus roll while attacking and +" ..  bonus_roll_def .. " bonus roll while defending.")
    return class
 end

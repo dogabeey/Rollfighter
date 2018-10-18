@@ -1,5 +1,6 @@
 Race = {}
 Race.__index = Race
+race_list = {}
 
 function Race:Create(name, bonus_roll_att,bonus_roll_def,crit_damage,crit_chance)
    local race = {}             -- our new object
@@ -12,6 +13,7 @@ function Race:Create(name, bonus_roll_att,bonus_roll_def,crit_damage,crit_chance
    race.crit_damage = crit_damage or GLOBAL.DEF_CRIT_DAMAGE
    race.crit_chance = crit_chance or GLOBAL.DEF_CRIT_CHANCE
    --print("Created a race named " .. name .. " which has +" .. bonus_roll_att .. " bonus roll while attacking and +" ..  bonus_roll_def .. " bonus roll while defending.")
+   race_list[race.name] = race
    return race
 end
 
