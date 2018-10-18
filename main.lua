@@ -23,19 +23,19 @@ frame:SetScript("OnEvent",
 function(self, event, pre, message, dist, sender)
 	if(event == "CHAT_MSG_ADDON_LOGGED") then
 		local senderraw = SeperateString(sender, "-")
-		--print(sender .. " : " .. senderraw[1])
-		--print(CheckDistance(senderraw[1],"player",40))
-		if((CheckDistance(senderraw[1],"player",GLOBAL.NOTIFY_RANGE)) == 1) then
+		----print(sender .. " : " .. senderraw[1])
+		----print(CheckDistance(senderraw[1],"player",40))
+		if((CheckDistance(senderraw[1],"player",RFT_GLOB.NOTIFY_RANGE)) == 1) then
 			if(pre == prefix_send) then
-				print("message: " .. message)
+				--print("message: " .. message)
 				local glob = SeperateString(string.upper(message),"-")
-				print(glob[1] .. ": " .. glob[2])
-				print(sender .. " sent you " .. glob[1] .. " data as " .. glob[2])
-				GLOBAL[glob[1]] = glob[2]
+				--print(glob[1] .. ": " .. glob[2])
+				--print(sender .. " sent you " .. glob[1] .. " data as " .. glob[2])
+				RFT_GLOB[glob[1]] = glob[2]
 				syncedPerson = senderraw[1]
 			end
 			if(pre == prefix_req) then
-				print(sender .. " requested " .. message .. " data from you.")
+				--print(sender .. " requested " .. message .. " data from you.")
 				SendGlobal(message,sender) -- "Return to sender"
 			end
 			if(pre == prefix_val) then
@@ -46,7 +46,7 @@ function(self, event, pre, message, dist, sender)
 			end
 	    end
 	end
-	if((event == "PARTY_LEADER_CHANGED" or event == "ADDON_LOADED") and not UnitIsGroupLeader("player"))then
+	if((event == "PARTY_LEADER_CHANGED") and not UnitIsGroupLeader("player"))then
 		RequestGlobal()
 	end
 end)
@@ -75,37 +75,37 @@ end
 function SendGlobal(global_data_string, reciever)
 	local data = SeperateString(global_data_string,".")
 	if(data[4]) then
-		local real_data = GLOBAL[data[1]][data[2]][data[3]][data[4]]
+		local real_data = RFT_GLOB[data[1]][data[2]][data[3]][data[4]]
 		if(reciever) then
 			local recieverraw = SeperateString(reciever, "-")
-			print("Sending " .. global_data_string .. " with value of " .. real_data .. " to " .. recieverraw[1])
+			--print("Sending " .. global_data_string .. " with value of " .. real_data .. " to " .. recieverraw[1])
 			 C_ChatInfo.SendAddonMessageLogged(prefix_send, global_data_string .. "-" .. real_data, "WHISPER", recieverraw[1])
 		else 
 			C_ChatInfo.SendAddonMessageLogged(prefix_send, global_data_string .. "-" .. real_data, "PARTY") 
 		end
 	elseif(data[3]) then
-		local real_data = GLOBAL[data[1]][data[2]][data[3]]
+		local real_data = RFT_GLOB[data[1]][data[2]][data[3]]
 		if(reciever) then
 			local recieverraw = SeperateString(reciever, "-")
-			print("Sending " .. global_data_string .. " with value of " .. real_data .. " to " .. recieverraw[1])
+			--print("Sending " .. global_data_string .. " with value of " .. real_data .. " to " .. recieverraw[1])
 			 C_ChatInfo.SendAddonMessageLogged(prefix_send, global_data_string .. "-" .. real_data, "WHISPER", recieverraw[1])
 		else 
 			C_ChatInfo.SendAddonMessageLogged(prefix_send, global_data_string .. "-" .. real_data, "PARTY") 
 		end
 	elseif(data[2]) then
-		local real_data = GLOBAL[data[1]][data[2]]
+		local real_data = RFT_GLOB[data[1]][data[2]]
 		if(reciever) then
 			local recieverraw = SeperateString(reciever, "-")
-			print("Sending " .. global_data_string .. " with value of " .. real_data .. " to " .. recieverraw[1])
+			--print("Sending " .. global_data_string .. " with value of " .. real_data .. " to " .. recieverraw[1])
 			 C_ChatInfo.SendAddonMessageLogged(prefix_send, global_data_string .. "-" .. real_data, "WHISPER", recieverraw[1])
 		else 
 			C_ChatInfo.SendAddonMessageLogged(prefix_send, global_data_string .. "-" .. real_data, "PARTY") 
 		end
 	else
-		local real_data = GLOBAL[data[1]]
+		local real_data = RFT_GLOB[data[1]]
 		if(reciever) then
 			local recieverraw = SeperateString(reciever, "-")
-			print("Sending " .. global_data_string .. " with value of " .. real_data .. " to " .. recieverraw[1])
+			--print("Sending " .. global_data_string .. " with value of " .. real_data .. " to " .. recieverraw[1])
 			 C_ChatInfo.SendAddonMessageLogged(prefix_send, global_data_string .. "-" .. real_data, "WHISPER", recieverraw[1])
 		else 
 			C_ChatInfo.SendAddonMessageLogged(prefix_send, global_data_string .. "-" .. real_data, "PARTY") 
@@ -115,29 +115,30 @@ end
 
 function RequestGlobal(global_data_string)
 	if(global_data_string) then
-		print("Requesting " .. global_data_string .. " from " .. UnitName("party1"))
+		--print("Requesting " .. global_data_string .. " from " .. UnitName("party1"))
 		C_ChatInfo.SendAddonMessageLogged(prefix_req,global_data_string,"WHISPER",UnitName("party1"))
 	else
-		local rp_class = string.upper(GetRPClass("player").name)
-		local rp_race = string.upper(GetRPRace("player").name)
-	
 		C_ChatInfo.SendAddonMessageLogged(prefix_req,"DEF_ROLL","WHISPER",UnitName("party1"))
 		C_ChatInfo.SendAddonMessageLogged(prefix_req,"DEF_NORMAL_DAMAGE","WHISPER",UnitName("party1"))
 		C_ChatInfo.SendAddonMessageLogged(prefix_req,"DEF_CRIT_DAMAGE","WHISPER",UnitName("party1"))
 		C_ChatInfo.SendAddonMessageLogged(prefix_req,"DEF_CRIT_CHANCE","WHISPER",UnitName("party1"))
 		C_ChatInfo.SendAddonMessageLogged(prefix_req,"MAX_HEALTH","WHISPER",UnitName("party1"))
+		for key, val in pairs(class_list) do
+			local rp_class = string.upper(val)
+			C_ChatInfo.SendAddonMessageLogged(prefix_req,"ADVANTAGES.CLASS." .. rp_class .. ".ATTACK" ,"WHISPER",UnitName("party1"))
+			C_ChatInfo.SendAddonMessageLogged(prefix_req,"ADVANTAGES.CLASS." .. rp_class .. ".DEFEND" ,"WHISPER",UnitName("party1"))
+			C_ChatInfo.SendAddonMessageLogged(prefix_req,"ADVANTAGES.CLASS." .. rp_class .. ".CRIT_CHANCE" ,"WHISPER",UnitName("party1"))
+			C_ChatInfo.SendAddonMessageLogged(prefix_req,"ADVANTAGES.CLASS." .. rp_class .. ".CRIT_DAMAGE" ,"WHISPER",UnitName("party1"))
+		end
+		for key, val in pairs(race_list) do
+			local rp_race = string.upper(val)
+			C_ChatInfo.SendAddonMessageLogged(prefix_req,"ADVANTAGES.RACE." .. rp_race .. ".ATTACK" ,"WHISPER",UnitName("party1"))
+			C_ChatInfo.SendAddonMessageLogged(prefix_req,"ADVANTAGES.RACE." .. rp_race .. ".DEFEND" ,"WHISPER",UnitName("party1"))
+			C_ChatInfo.SendAddonMessageLogged(prefix_req,"ADVANTAGES.RACE." .. rp_race .. ".CRIT_CHANCE" ,"WHISPER",UnitName("party1"))
+			C_ChatInfo.SendAddonMessageLogged(prefix_req,"ADVANTAGES.RACE." .. rp_race .. ".CRIT_DAMAGE" ,"WHISPER",UnitName("party1"))
+		end
 		
-		C_ChatInfo.SendAddonMessageLogged(prefix_req,"ADVANTAGES.CLASS." .. rp_class .. ".ATTACK" ,"WHISPER",UnitName("party1"))
-		C_ChatInfo.SendAddonMessageLogged(prefix_req,"ADVANTAGES.CLASS." .. rp_class .. ".DEFEND" ,"WHISPER",UnitName("party1"))
-		C_ChatInfo.SendAddonMessageLogged(prefix_req,"ADVANTAGES.CLASS." .. rp_class .. ".CRIT_CHANCE" ,"WHISPER",UnitName("party1"))
-		C_ChatInfo.SendAddonMessageLogged(prefix_req,"ADVANTAGES.CLASS." .. rp_class .. ".CRIT_DAMAGE" ,"WHISPER",UnitName("party1"))
-		
-		C_ChatInfo.SendAddonMessageLogged(prefix_req,"ADVANTAGES.RACE." .. rp_race .. ".ATTACK" ,"WHISPER",UnitName("party1"))
-		C_ChatInfo.SendAddonMessageLogged(prefix_req,"ADVANTAGES.RACE." .. rp_race .. ".DEFEND" ,"WHISPER",UnitName("party1"))
-		C_ChatInfo.SendAddonMessageLogged(prefix_req,"ADVANTAGES.RACE." .. rp_race .. ".CRIT_CHANCE" ,"WHISPER",UnitName("party1"))
-		C_ChatInfo.SendAddonMessageLogged(prefix_req,"ADVANTAGES.RACE." .. rp_race .. ".CRIT_DAMAGE" ,"WHISPER",UnitName("party1"))
-		
-		-- TODO: BÜTÜN CLASSLARIN BİLGİSİ GEREKİYOR.
+			-- TODO: BÜTÜN CLASSLARIN BİLGİSİ GEREKİYOR.
 	end
 end
 
@@ -151,13 +152,13 @@ function DefineConfig(args, variable_text, error_text)
 			local val = string.upper(variable_text)
 		if(args[2]) then
 			if(tonumber(args[2]) ~= nil) then
-				GLOBAL[val] = args[2]
-				SendSystemMessage("New value of " .. variable_text .. " is " .. GLOBAL[val])
+				RFT_GLOB[val] = args[2]
+				SendSystemMessage("New value of " .. variable_text .. " is " .. RFT_GLOB[val])
 			else 
 				SendSystemMessage("Enter a decimal, please!")
 			end
 		else
-			SendSystemMessage(variable_text .. ": " .. GLOBAL[val])
+			SendSystemMessage(variable_text .. ": " .. RFT_GLOB[val])
 		end
 	else
 		SendSystemMessage("Please specify a correct config variable.")
@@ -178,12 +179,12 @@ end
 
 function CheckDistance(player1, player2, dist)
 	local p1x, p1y, p1z, p1map = UnitPosition(player1)
-	--print(UnitName(player1) .. "'s position is " .. p1x .. " " .. p1y .. " " .. p1z .. ".") 
+	----print(UnitName(player1) .. "'s position is " .. p1x .. " " .. p1y .. " " .. p1z .. ".") 
 	local p2x, p2y, p2z, p2map = UnitPosition(player2)
-	--print(UnitName(player2) .. "'s position is " .. p2x .. " " .. p2y .. " " .. p2z .. ".") 
+	----print(UnitName(player2) .. "'s position is " .. p2x .. " " .. p2y .. " " .. p2z .. ".") 
 	if(p1map == p2map) then
 		local delta = math.sqrt((p2x - p1x)*(p2x - p1x) + (p2y - p1y)*(p2y - p1y) + (p2z - p1z)*(p2z - p1z))
-		--print("Distance between them is " .. delta .. ".")
+		----print("Distance between them is " .. delta .. ".")
 		if(dist > delta) then
 			return 1
 		else
@@ -198,11 +199,11 @@ buffer = ""
 function StringifyTable(e)
 	if type(e) == "table" then
         for k,v in pairs(e) do
-			print(v)
+			--print(v)
             StringifyTable(v)
         end
     else 
-		print(e)
+		--print(e)
     end
 end
 
@@ -212,8 +213,8 @@ function AttackPlayer()
 		if(targetRealm == nil) then
 			local player = UnitName("player")
 			local target = UnitName("target")
-			local attacker_total_bonus_roll = GLOBAL.DEF_ROLL + GetRPClass("player").bonus_roll_att + GetRPRace("player").bonus_roll_att
-			local defender_total_bonus_roll = GLOBAL.DEF_ROLL + GetRPClass("target").bonus_roll_att + GetRPRace("target").bonus_roll_att
+			local attacker_total_bonus_roll = RFT_GLOB.DEF_ROLL + GetRPClass("player").bonus_roll_att + GetRPRace("player").bonus_roll_att
+			local defender_total_bonus_roll = RFT_GLOB.DEF_ROLL + GetRPClass("target").bonus_roll_att + GetRPRace("target").bonus_roll_att
 			local attacker_critical_strike_damage = GetRPClass("player").crit_damage
 			local attacker_critical_strike_chance = GetRPClass("player").crit_chance
 			
@@ -228,7 +229,7 @@ function AttackPlayer()
 				.. dice_result_defender .. " over " .. defender_total_bonus_roll .. ".", messageType)
 			elseif(dice_result_attacker > dice_result_defender) then
 				C_ChatInfo.SendAddonMessageLogged(prefix, "Success! " .. player .. " damaged their opponent " .. target 
-				.. " with " .. GLOBAL.DEF_NORMAL_DAMAGE .. " damage, by rolling " .. dice_result_attacker .. " over " .. attacker_total_bonus_roll .. " while opponent rolled " 
+				.. " with " .. RFT_GLOB.DEF_NORMAL_DAMAGE .. " damage, by rolling " .. dice_result_attacker .. " over " .. attacker_total_bonus_roll .. " while opponent rolled " 
 				.. dice_result_defender .. " over " .. defender_total_bonus_roll .. ".", messageType)
 			else
 				C_ChatInfo.SendAddonMessageLogged(prefix, player .. " missed an attack against " .. target 
@@ -245,8 +246,8 @@ function AttackPlayer()
 			if(syncedPerson == UnitName("party1")) then
 				local player = UnitName("player")
 				local target = UnitName("target")
-				local attacker_total_bonus_roll = GLOBAL.DEF_ROLL + GetRPClass("player").bonus_roll_att + GetRPRace("player").bonus_roll_att
-				local defender_total_bonus_roll = GLOBAL.DEF_ROLL + GetRPClass("target").bonus_roll_att + GetRPRace("target").bonus_roll_att
+				local attacker_total_bonus_roll = RFT_GLOB.DEF_ROLL + GetRPClass("player").bonus_roll_att + GetRPRace("player").bonus_roll_att
+				local defender_total_bonus_roll = RFT_GLOB.DEF_ROLL + GetRPClass("target").bonus_roll_att + GetRPRace("target").bonus_roll_att
 				local attacker_critical_strike_damage = GetRPClass("player").crit_damage
 				local attacker_critical_strike_chance = GetRPClass("player").crit_chance
 				
@@ -261,7 +262,7 @@ function AttackPlayer()
 					.. dice_result_defender .. " over " .. defender_total_bonus_roll .. ".", messageType)
 				elseif(dice_result_attacker > dice_result_defender) then
 					C_ChatInfo.SendAddonMessageLogged(prefix, "Success! " .. player .. " damaged their opponent " .. target 
-					.. " with " .. GLOBAL.DEF_NORMAL_DAMAGE .. " damage, by rolling " .. dice_result_attacker .. " over " .. attacker_total_bonus_roll .. " while opponent rolled " 
+					.. " with " .. RFT_GLOB.DEF_NORMAL_DAMAGE .. " damage, by rolling " .. dice_result_attacker .. " over " .. attacker_total_bonus_roll .. " while opponent rolled " 
 					.. dice_result_defender .. " over " .. defender_total_bonus_roll .. ".", messageType)
 				else
 					C_ChatInfo.SendAddonMessageLogged(prefix, player .. " missed an attack against " .. target 
@@ -281,8 +282,8 @@ function AttackNPC()
 	local player = UnitName("player")
 	local target = UnitName("target")
 	
-	local attacker_total_bonus_roll = GLOBAL.DEF_ROLL + GetRPClass("player").bonus_roll_att + GetRPRace("player").bonus_roll_att
-	local defender_total_bonus_roll = GLOBAL.DEF_ROLL
+	local attacker_total_bonus_roll = RFT_GLOB.DEF_ROLL + GetRPClass("player").bonus_roll_att + GetRPRace("player").bonus_roll_att
+	local defender_total_bonus_roll = RFT_GLOB.DEF_ROLL
 	local attacker_critical_strike_damage = GetRPClass("player").crit_damage
 	local attacker_critical_strike_chance = GetRPClass("player").crit_chance
 	
@@ -297,7 +298,7 @@ function AttackNPC()
 		.. dice_result_defender .. " over " .. defender_total_bonus_roll .. ".", messageType)
 	elseif(dice_result_attacker > dice_result_defender) then
 		C_ChatInfo.SendAddonMessageLogged(prefix, "Success! " .. player .. " damaged their opponent " .. target 
-		.. " with " .. GLOBAL.DEF_NORMAL_DAMAGE .. " damage, by rolling " .. dice_result_attacker .. " over " .. attacker_total_bonus_roll .. " while opponent rolled " 
+		.. " with " .. RFT_GLOB.DEF_NORMAL_DAMAGE .. " damage, by rolling " .. dice_result_attacker .. " over " .. attacker_total_bonus_roll .. " while opponent rolled " 
 		.. dice_result_defender .. " over " .. defender_total_bonus_roll .. ".", messageType)
 	else
 		C_ChatInfo.SendAddonMessageLogged(prefix, player .. " missed an attack against " .. target 

@@ -3,7 +3,7 @@
 ## Author: dogabeey
 ## Notes: Configurable DM Helper for Roll Fights in RP.
 ## Version: 0.02
-##SavedVariablesPerCharacter: GLOBAL.DEF_ROLL, GLOBAL.ADVANTAGES
+## SavedVariablesPerCharacter: RFT_GLOB
 
 definitions.lua
 Classes\classClass.lua
