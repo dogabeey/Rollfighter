@@ -46,7 +46,7 @@ function(self, event, pre, message, dist, sender)
 			end
 	    end
 	end
-	if((event == "PARTY_LEADER_CHANGED") and not UnitIsGroupLeader("player"))then
+	if((event == "PARTY_LEADER_CHANGED" or event == "ADDON_LOADED") and not UnitIsGroupLeader("player"))then
 		RequestGlobal()
 	end
 end)
@@ -137,8 +137,6 @@ function RequestGlobal(global_data_string)
 			C_ChatInfo.SendAddonMessageLogged(prefix_req,"ADVANTAGES.RACE." .. rp_race .. ".CRIT_CHANCE" ,"WHISPER",UnitName("party1"))
 			C_ChatInfo.SendAddonMessageLogged(prefix_req,"ADVANTAGES.RACE." .. rp_race .. ".CRIT_DAMAGE" ,"WHISPER",UnitName("party1"))
 		end
-		
-			-- TODO: BÜTÜN CLASSLARIN BİLGİSİ GEREKİYOR.
 	end
 end
 
@@ -194,7 +192,7 @@ function CheckDistance(player1, player2, dist)
 		return -1
 	end
 end
-
+--[[
 buffer = ""
 function StringifyTable(e)
 	if type(e) == "table" then
@@ -206,7 +204,7 @@ function StringifyTable(e)
 		--print(e)
     end
 end
-
+]]
 function AttackPlayer()
 	local _, targetRealm = UnitFullName("target")
 	if(UnitIsGroupLeader("player")) then
@@ -253,8 +251,6 @@ function AttackPlayer()
 				
 				local dice_result_attacker = math.random(attacker_total_bonus_roll)
 				local dice_result_defender = math.random(defender_total_bonus_roll)
-				-- IMPORTANT: In release; SendAddonMessageLogged(...) will be sent to a whole group once configs are added. Not the channel.
-				-- "WHISPER" argument is debugging purposes only, since It seems I'm not able to send signal to myself via channels.
 				local messageType = "PARTY"
 				if(dice_result_attacker - dice_result_defender > attacker_critical_strike_chance) then
 					C_ChatInfo.SendAddonMessageLogged(prefix, "A critical hit!! " .. player .. " critically hit their opponent " .. target 
@@ -289,8 +285,6 @@ function AttackNPC()
 	
 	local dice_result_attacker = math.random(attacker_total_bonus_roll)
 	local dice_result_defender = math.random(defender_total_bonus_roll)
-	-- IMPORTANT: In release; SendAddonMessageLogged(...) will be sent to a whole group once configs are added. Not the channel.
-	-- "WHISPER" argument is debugging purposes only, since It seems I'm not able to send signal to myself via channels.
 	local messageType = "PARTY"
 	if(dice_result_attacker - dice_result_defender > attacker_critical_strike_chance) then
 		C_ChatInfo.SendAddonMessageLogged(prefix, "A critical hit!! " .. player .. " critically hit their opponent " .. target 
