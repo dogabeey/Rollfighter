@@ -69,6 +69,14 @@ function SlashCmdList.ROLLFIGHT(msg,editbox)
 			-- TODO: Find and easy way to automaticly add config command for each saved variables. UPDATE: Poor LUA can't get name of variables. Boo. Consider define name in each table.
 			
 			DefineConfig(args)
+		elseif(cmd == "help") then
+			args = SeperateString(args," ")
+			if(args[1] == "config") then
+				SendSystemMessage("|cff1ec456Syntax: rft config <config_string> [<new_value>]. You can find config strings under <addonFolder>/definitions.lua (Type without RFT_GLOB. part). Example: /rft config advantages.race.tauren.defense 50|r")
+			end
+			if(args[1] == "attack") then
+				SendSystemMessage("Simply click a player in your realm or an NPC to 'attack' them. Game will calculate your class' and race's attack power and roll for you, while also rolls for your target according to their attack & defend. Then It returns the results to the Chat window. Critical damage is determined by difference between your rolls."
+			end
 		else
 			SendSystemMessage("There is no such sub-command.")
 		end
@@ -150,59 +158,55 @@ function DeSync()
 end
 
 function DefineConfig(args)
-	local found = nil
-	args[1] = string.upper(args[1])
-	for k, v in pairs(RFT_GLOB_LIST) do
-		if (v == args[1]) then
-			found = v
-			break 
+	if(args[1]) then
+		local found = nil
+		args[1] = string.upper(args[1])
+		for k, v in pairs(RFT_GLOB_LIST) do
+			if (v == args[1]) then
+				found = v
+				break 
+			end
 		end
-	end
-	if(found) then
-		local data = SeperateString(found,".")
-		local real_data = nil
-		if(data[4]) then
-			real_data = RFT_GLOB[data[1]][data[2]][data[3]][data[4]]
-		elseif(data[3]) then
-			real_data = RFT_GLOB[data[1]][data[2]][data[3]]
-		elseif(data[2]) then
-			real_data = RFT_GLOB[data[1]][data[2]]
-		elseif(data[1]) then
-			real_data = RFT_GLOB[data[1]]
-		end
-		if(args[2]) then
+		if(found) then
+			local data = SeperateString(found,".")
+			local real_data = nil
 			if(data[4]) then
-				RFT_GLOB[data[1]][data[2]][data[3]][data[4]] = args[2]
+				real_data = RFT_GLOB[data[1]][data[2]][data[3]][data[4]]
 			elseif(data[3]) then
-				RFT_GLOB[data[1]][data[2]][data[3]] = args[2]
+				real_data = RFT_GLOB[data[1]][data[2]][data[3]]
 			elseif(data[2]) then
-				RFT_GLOB[data[1]][data[2]]= args[2]
+				real_data = RFT_GLOB[data[1]][data[2]]
 			elseif(data[1]) then
-				RFT_GLOB[data[1]]= args[2]
+				real_data = RFT_GLOB[data[1]]
+			end
+			if(args[2]) then
+				if(data[4]) then
+					RFT_GLOB[data[1]][data[2]][data[3]][data[4]] = args[2]
+				elseif(data[3]) then
+					RFT_GLOB[data[1]][data[2]][data[3]] = args[2]
+				elseif(data[2]) then
+					RFT_GLOB[data[1]][data[2]]= args[2]
+				elseif(data[1]) then
+					RFT_GLOB[data[1]]= args[2]
+				end
+				SendSystemMessage("Changed " .. args[1] .. " value to " .. args[2])
+			else
+				SendSystemMessage(args[1] .. ": " .. real_data)
 			end
 		else
-			SendSystemMessage(args[1] .. ": " .. real_data)
+			SendSystemMessage("There is no such configuration.")
 		end
 	else
-		SendSystemMessage("There is no such configuration.")
+		SendSystemMessage("|cff1ec456Syntax: rft config <config_string> [<new_value>]. You can find config strings under <addonFolder>/definitions.lua (Type without RFT_GLOB. part). Example: /rft config advantages.race.tauren.defense 50|r")
 	end
 end
 
-function ParseAllGlobals(tab, prefixtab) -- Tab = tab to print, prefix = inital tab ({'GLOBAL'} in your case) or nil
-	local retVal = {}
-    prefixtab = prefixtab or {}
-    local idx = #prefixtab+1
-    for k,v in pairs(tab) do
-        prefixtab[idx] = k
-        --print(table.concat(prefixtab, '.')) -- Comment to don't print for every path
-        if type(v) == 'table' then
-            ParseAllGlobals(v, prefixtab)
-        else -- To print only complete pathes
-            retVal[table.concat(prefixtab, '.')] = table.concat(prefixtab, '.')
-        end
-    end
-    prefixtab[idx] = nil
-	return retVal
+function PrintTable(tab)
+	local text = ""
+	for k,v in pairs(tab) do
+		text = text .. v
+	end
+	return text
 end
 
 function SeperateString(inputstr, sep)
@@ -234,19 +238,7 @@ function CheckDistance(player1, player2, dist)
 		return -1
 	end
 end
---[[
-buffer = ""
-function StringifyTable(e)
-	if type(e) == "table" then
-        for k,v in pairs(e) do
-			--print(v)
-            StringifyTable(v)
-        end
-    else 
-		--print(e)
-    end
-end
-]]
+
 function AttackPlayer()
 	local _, targetRealm = UnitFullName("target")
 	if(UnitIsGroupLeader("player")) then

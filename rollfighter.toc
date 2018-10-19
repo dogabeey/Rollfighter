@@ -13,5 +13,3 @@ classes.lua
 races.lua
 advantages.lua
 main.lua
-
-UI\config.xml
