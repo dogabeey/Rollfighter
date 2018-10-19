@@ -22,4 +22,12 @@ Syntax: rft config <config_string> \[<new_value>\]
 
 Rollfighter hasn't got any kind of UI (YET!!) so addon configuration is made from the Chat. You can find config strings under <addonFolder>/definitions.lua (Type without RFT_GLOB. part). Example: **/rft config advantages.race.tauren.defense 50** changes Defense value of all Taurens in your party from 0 to 50, which makes them roll 150 instead of 100 while defending (Well, they're big guys, after all!)
 
-Once changed, configurations persist through gameplay.
+Once changed, configurations persist through game sessions.
+
+### Changelog
+
+None. This is a fresh addon. Yey.
+
+### Help & Feedback
+
+This is my first ever World of Warcraft addon. A lot of features on their way and a lot of codes will be cleansed! Any feedback regarding bugs, new ideas or criticism is greatly appreciated. You can contact me via my personal e-mail: **dogabeey@gmail.com**. Feel free to fork this project(good luck with reading that code, heh1), or you can contact me to be a contrubitor. As a fresh programmer with no freakin' clue, I could use any kind of help. Thank you.
