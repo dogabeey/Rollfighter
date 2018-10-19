@@ -55,15 +55,20 @@ function SlashCmdList.ROLLFIGHT(msg,editbox)
 	local _, _, cmd, args = string.find(msg, "%s?(%w+)%s?(.*)")
 	if(cmd) then
 		if(cmd == "attack") then
-			if(UnitIsPlayer("target")) then
-				AttackPlayer()
+			if(UnitName("target")) then
+				if(UnitIsPlayer("target")) then
+					AttackPlayer()
+				else
+					AttackNPC()
+				end
 			else
-				AttackNPC()
+				SendSystemMessage("You have no target.")
 			end
 		elseif(cmd == "config") then
 			args = SeperateString(args," ")
 			-- TODO: Find and easy way to automaticly add config command for each saved variables. UPDATE: Poor LUA can't get name of variables. Boo. Consider define name in each table.
-			DefineConfig(args,"def_roll")
+			
+			DefineConfig(args)
 		else
 			SendSystemMessage("There is no such sub-command.")
 		end
@@ -144,23 +149,60 @@ function DeSync()
 	C_ChatInfo.SendAddonMessageLogged(prefix_val," ","PARTY")
 end
 
--- global variable name defined in definitions.lua should be written as second parameter, case-insensitive.
-function DefineConfig(args, variable_text, error_text)
-	if(args[1] == variable_text) then
-			local val = string.upper(variable_text)
+function DefineConfig(args)
+	local found = nil
+	args[1] = string.upper(args[1])
+	for k, v in pairs(RFT_GLOB_LIST) do
+		if (v == args[1]) then
+			found = v
+			break 
+		end
+	end
+	if(found) then
+		local data = SeperateString(found,".")
+		local real_data = nil
+		if(data[4]) then
+			real_data = RFT_GLOB[data[1]][data[2]][data[3]][data[4]]
+		elseif(data[3]) then
+			real_data = RFT_GLOB[data[1]][data[2]][data[3]]
+		elseif(data[2]) then
+			real_data = RFT_GLOB[data[1]][data[2]]
+		elseif(data[1]) then
+			real_data = RFT_GLOB[data[1]]
+		end
 		if(args[2]) then
-			if(tonumber(args[2]) ~= nil) then
-				RFT_GLOB[val] = args[2]
-				SendSystemMessage("New value of " .. variable_text .. " is " .. RFT_GLOB[val])
-			else 
-				SendSystemMessage("Enter a decimal, please!")
+			if(data[4]) then
+				RFT_GLOB[data[1]][data[2]][data[3]][data[4]] = args[2]
+			elseif(data[3]) then
+				RFT_GLOB[data[1]][data[2]][data[3]] = args[2]
+			elseif(data[2]) then
+				RFT_GLOB[data[1]][data[2]]= args[2]
+			elseif(data[1]) then
+				RFT_GLOB[data[1]]= args[2]
 			end
 		else
-			SendSystemMessage(variable_text .. ": " .. RFT_GLOB[val])
+			SendSystemMessage(args[1] .. ": " .. real_data)
 		end
 	else
-		SendSystemMessage("Please specify a correct config variable.")
+		SendSystemMessage("There is no such configuration.")
 	end
+end
+
+function ParseAllGlobals(tab, prefixtab) -- Tab = tab to print, prefix = inital tab ({'GLOBAL'} in your case) or nil
+	local retVal = {}
+    prefixtab = prefixtab or {}
+    local idx = #prefixtab+1
+    for k,v in pairs(tab) do
+        prefixtab[idx] = k
+        --print(table.concat(prefixtab, '.')) -- Comment to don't print for every path
+        if type(v) == 'table' then
+            ParseAllGlobals(v, prefixtab)
+        else -- To print only complete pathes
+            retVal[table.concat(prefixtab, '.')] = table.concat(prefixtab, '.')
+        end
+    end
+    prefixtab[idx] = nil
+	return retVal
 end
 
 function SeperateString(inputstr, sep)
