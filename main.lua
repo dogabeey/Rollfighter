@@ -39,7 +39,7 @@ function(self, event, pre, message, dist, sender)
 				SendGlobal(message,sender) -- "Return to sender"
 			end
 			if(pre == prefix_val) then
-				--
+				RequestGlobal()
 			end
 			if(dist == "PARTY" or dist == "RAID") then
 				SendSystemMessage(message)
@@ -67,7 +67,7 @@ function SlashCmdList.ROLLFIGHT(msg,editbox)
 		elseif(cmd == "config") then
 			args = SeperateString(args," ")
 			-- TODO: Find and easy way to automaticly add config command for each saved variables. UPDATE: Poor LUA can't get name of variables. Boo. Consider define name in each table.
-			
+			C_ChatInfo.SendAddonMessageLogged(prefix_val, "Notifying config changes", "PARTY")
 			DefineConfig(args)
 		elseif(cmd == "help") then
 			args = SeperateString(args," ")
@@ -101,7 +101,7 @@ function SendGlobal(global_data_string, reciever)
 		if(reciever) then
 			local recieverraw = SeperateString(reciever, "-")
 			--print("Sending " .. global_data_string .. " with value of " .. real_data .. " to " .. recieverraw[1])
-			 C_ChatInfo.SendAddonMessageLogged(prefix_send, global_data_string .. "-" .. real_data, "WHISPER", recieverraw[1])
+			C_ChatInfo.SendAddonMessageLogged(prefix_send, global_data_string .. "-" .. real_data, "WHISPER", recieverraw[1])
 		else 
 			C_ChatInfo.SendAddonMessageLogged(prefix_send, global_data_string .. "-" .. real_data, "PARTY") 
 		end
