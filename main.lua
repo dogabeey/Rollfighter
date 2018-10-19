@@ -75,7 +75,7 @@ function SlashCmdList.ROLLFIGHT(msg,editbox)
 				SendSystemMessage("|cff1ec456Syntax: rft config <config_string> [<new_value>]. You can find config strings under <addonFolder>/definitions.lua (Type without RFT_GLOB. part). Example: /rft config advantages.race.tauren.defense 50|r")
 			end
 			if(args[1] == "attack") then
-				SendSystemMessage("Simply click a player in your realm or an NPC to 'attack' them. Game will calculate your class' and race's attack power and roll for you, while also rolls for your target according to their attack & defend. Then It returns the results to the Chat window. Critical damage is determined by difference between your rolls."
+				SendSystemMessage("Simply click a player in your realm or an NPC to 'attack' them. Game will calculate your class' and race's attack power and roll for you, while also rolls for your target according to their attack & defend. Then It returns the results to the Chat window. Critical damage is determined by difference between your rolls.")
 			end
 		else
 			SendSystemMessage("There is no such sub-command.")
