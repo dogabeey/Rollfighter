@@ -38,7 +38,7 @@ function(self, event, pre, message, dist, sender)
 				--print(sender .. " requested " .. message .. " data from you.")
 				SendGlobal(message,sender) -- "Return to sender"
 			end
-			if(pre == prefix_val) then
+			if(pre == prefix_val and not UnitIsGroupLeader("player")) then
 				RequestGlobal()
 			end
 			if(dist == "PARTY" or dist == "RAID") then
