@@ -77,6 +77,8 @@ function SlashCmdList.ROLLFIGHT(msg,editbox)
 			if(args[1] == "attack") then
 				SendSystemMessage("Simply click a player in your realm or an NPC to 'attack' them. Game will calculate your class' and race's attack power and roll for you, while also rolls for your target according to their attack & defend. Then It returns the results to the Chat window. Critical damage is determined by difference between your rolls.")
 			end
+		elseif(cmd == "resetall")
+			RFT_GLOB = RFT_GLOB_DEF
 		else
 			SendSystemMessage("There is no such sub-command.")
 		end
